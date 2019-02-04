@@ -2,13 +2,12 @@ FROM php:7.3-fpm-stretch
 
 ARG USE_PORT_AS_VERSION=
 
-ENV COMPOSER_NO_INTERACTION=1 \
-	COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_NO_INTERACTION=1
 
 RUN set -x && \
 #
-	apt update && \
-	apt-get install -y --no-install-recommends git zip unzip curl vim-tiny net-tools procps less && \
+	apt-get update && \
+	apt-get install -y --no-install-recommends git zip unzip curl vim-tiny net-tools procps less rclone && \
 	rm -rf /var/lib/apt/lists/* && \
 #
 	sed -i "s/^listen = \(.*\)$/;listen = \1/" /usr/local/etc/php-fpm.d/zz-docker.conf && \
@@ -25,4 +24,9 @@ RUN set -x && \
 		echo; \
 	} | tee /usr/local/etc/php-fpm.d/www.conf && \
 #
+	rm -rf /var/www/html && \
+	chown -R www-data:www-data /var/www && \
+#
 	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+WORKDIR /var/www

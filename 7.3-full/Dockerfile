@@ -1,86 +1,128 @@
-FROM mastappl/php-fpm:7.3-base
+FROM d2cio/php-fpm:7.3-base
 
 RUN set -x && \
 #
-	apt update && \
+	apt-get update && \
 	apt-mark showmanual > /tmp/savedAptMark && \
 #
 	docker-php-source extract && \
-# bcmath
+# ext: bcmath
 	docker-php-ext-install bcmath && \
-# bz2
+# ext: bz2
 	apt-get install -y --no-install-recommends libbz2-dev && \
 	docker-php-ext-install bz2 && \
-# calendar
+# ext: calendar
 	docker-php-ext-install calendar && \
-# exif
+# ext: dba
+	docker-php-ext-install dba && \
+# ext: enchant
+	apt-get install -y --no-install-recommends libenchant-dev && \
+	docker-php-ext-install enchant && \
+# ext: exif
 	docker-php-ext-install exif && \
-# gd
-	apt-get install -y --no-install-recommends libjpeg-dev libpng-dev libfreetype6-dev && \
-	docker-php-ext-configure gd --with-jpeg-dir --with-png-dir --with-freetype-dir && \
+# ext: gd
+	apt-get install -y --no-install-recommends libjpeg-dev libpng-dev libfreetype6-dev libwebp-dev libgif-dev && \
+	docker-php-ext-configure gd --with-jpeg-dir --with-png-dir --with-freetype-dir --with-webp-dir --with-gd && \
 	docker-php-ext-install gd && \
-# gmp
+# ext: gettext
+	docker-php-ext-install gettext && \
+# ext: gmp
 	apt-get install -y --no-install-recommends libgmp-dev && \
 	docker-php-ext-install gmp && \
-# imap
+# ext: imap
 	apt-get install -y --no-install-recommends libc-client-dev libkrb5-dev && \
 	docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
 	docker-php-ext-install imap && \
-# intl
+# ext: interbase
+	apt-get install -y --no-install-recommends firebird-dev && \
+	docker-php-ext-install interbase && \
+# ext: intl
 	apt-get install -y --no-install-recommends libicu-dev && \
 	docker-php-ext-install intl && \
-# ldap
+# ext: ldap
 	apt-get install -y --no-install-recommends libldap2-dev && \
 	docker-php-ext-install ldap && \
-# mysqli
+# ext: mysqli
 	docker-php-ext-install mysqli && \
-# opcache
+# ext: opcache
 	docker-php-ext-install opcache && \
-# pcntl
+# ext: pcntl
 	docker-php-ext-install pcntl && \
-# pdo_mysql
+# ext: pdo_dblib
+	apt-get install -y --no-install-recommends freetds-dev && \
+	docker-php-ext-configure pdo_dblib --with-libdir=lib/x86_64-linux-gnu && \
+	docker-php-ext-install pdo_dblib && \
+# ext: pdo_firebird
+	apt-get install -y --no-install-recommends firebird-dev && \
+	docker-php-ext-install pdo_firebird && \
+# ext: pdo_mysql
 	docker-php-ext-install pdo_mysql && \
-# pdo_pgsql
+# ext: pdo_odbc
+	apt-get install -y --no-install-recommends unixodbc-dev && \
+	docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr && \
+	docker-php-ext-install pdo_odbc && \
+# ext: pdo_pgsql
 	apt-get install -y --no-install-recommends libpq-dev && \
 	docker-php-ext-install pdo_pgsql && \
-# pgsql
+# ext: pgsql
+	apt-get install -y --no-install-recommends libpq-dev && \
 	docker-php-ext-install pgsql && \
-# soap
+# ext: pspell
+	apt-get install -y --no-install-recommends libpspell-dev && \
+	docker-php-ext-install pspell && \
+# ext: recode
+	apt-get install -y --no-install-recommends librecode-dev && \
+	docker-php-ext-install recode && \
+# ext: shmop
+	docker-php-ext-install shmop && \
+# ext: snmp
+	apt-get install -y --no-install-recommends libsnmp-dev snmp && \
+	echo "snmp" >> /tmp/savedAptMark && \
+	docker-php-ext-install snmp && \
+# ext: soap
 	apt-get install -y --no-install-recommends libxml2-dev && \
 	docker-php-ext-install soap && \
-# sockets
+# ext: sockets
 	docker-php-ext-install sockets && \
-# tidy
+# ext: sysvmsg
+	docker-php-ext-install sysvmsg && \
+# ext: sysvsem
+	docker-php-ext-install sysvsem && \
+# ext: sysvshm
+	docker-php-ext-install sysvshm && \
+# ext: tidy
 	apt-get install -y --no-install-recommends libtidy-dev && \
 	docker-php-ext-install tidy && \
-# xmlrpc
+# ext: wddx
+	apt-get install -y --no-install-recommends libxml2-dev && \
+	docker-php-ext-install wddx && \
+# ext: xmlrpc
+	apt-get install -y --no-install-recommends libxml2-dev && \
 	docker-php-ext-install xmlrpc && \
-# xsl
+# ext: xsl
 	apt-get install -y --no-install-recommends libxslt1-dev && \
 	docker-php-ext-install xsl && \
-# zip
+# ext: zip
 	apt-get install -y --no-install-recommends zlib1g-dev libzip-dev && \
+	docker-php-ext-configure zip --with-libzip && \
 	docker-php-ext-install zip && \
 # pecl: amqp
 	apt-get install -y --no-install-recommends librabbitmq-dev && \
 	pecl install -f amqp && \
 	docker-php-ext-enable amqp && \
-# pecl: memcached
-	apt-get install -y --no-install-recommends libmemcached-dev && \
-	pecl install -f memcached && \
-	docker-php-ext-enable memcached && \
-# pecl: xdebug
-	pecl install -f xdebug-beta && \
-	docker-php-ext-enable xdebug && \
 # pecl: apcu
 	pecl install -f apcu && \
 	docker-php-ext-enable apcu && \
 # pecl: ast
 	pecl install -f ast && \
 	docker-php-ext-enable ast && \
-# pecl: event
+# pecl: ds
 	pecl install -f ds && \
-	apt-get install -y --no-install-recommends libevent-dev && \
+	docker-php-ext-enable ds && \
+# ext: sockets
+	docker-php-ext-install sockets && \
+# pecl: event
+	apt-get install -y --no-install-recommends libevent-dev libssl1.0-dev && \
 	pecl install -f event && \
 	docker-php-ext-enable event && \
 # pecl: geoip
@@ -88,6 +130,7 @@ RUN set -x && \
 	pecl install -f geoip-beta && \
 	docker-php-ext-enable geoip && \
 # pecl: grpc
+	apt-get install -y --no-install-recommends libzip-dev && \
 	pecl install -f grpc && \
 	docker-php-ext-enable grpc && \
 # pecl: igbinary
@@ -97,10 +140,19 @@ RUN set -x && \
 	apt-get install -y --no-install-recommends libmagick++-dev && \
 	pecl install -f imagick && \
 	docker-php-ext-enable imagick && \
+# pecl: mcrypt
+	apt-get install -y --no-install-recommends libmcrypt-dev && \
+	pecl install -f mcrypt && \
+	docker-php-ext-enable mcrypt && \
+# pecl: memcached
+	apt-get install -y --no-install-recommends libmemcached-dev libzip-dev && \
+	pecl install -f memcached && \
+	docker-php-ext-enable memcached && \
 # pecl: mongodb
 	pecl install -f mongodb && \
 	docker-php-ext-enable mongodb && \
 # pecl: oauth
+	apt-get install -y --no-install-recommends libpcre3-dev && \
 	pecl install -f oauth && \
 	docker-php-ext-enable oauth && \
 # pecl: rdkafka
@@ -114,6 +166,9 @@ RUN set -x && \
 	apt-get install -y --no-install-recommends uuid-dev && \
 	pecl install -f uuid && \
 	docker-php-ext-enable uuid && \
+# pecl: xdebug
+	pecl install -f xdebug-beta && \
+	docker-php-ext-enable xdebug && \
 # pecl: yaml
 	apt-get install -y --no-install-recommends libyaml-dev && \
 	pecl install -f yaml && \
